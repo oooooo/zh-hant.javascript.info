@@ -507,7 +507,6 @@ alert( '\u005a' ); // Z
 ```
 
 現在我們來看代碼 `60..220` 的字元（拉丁字母和一些額外的字元）方法是用它們創建一個字串：
-
 ```js run
 let str = '';
 
@@ -534,10 +533,12 @@ alert( str );
 
 所以，瀏覽器需要知道要比較的語言是什麼。
 
-幸運的是，所有現代瀏覽器（IE10 -- 需要額外的函式庫 [Intl.JS](https://github.com/andyearnshaw/Intl.js/) 來支援國際化標準 [ECMA 402](http://www.ecma-international.org/ecma-402/1.0/ECMA-402.pdf)）。
+幸運的是，
+所有現代瀏覽器（IE10 -- 需要額外的函式庫 [Intl.JS](https://github.com/andyearnshaw/Intl.js/) 來支援國際化標準 [ECMA 402](http://www.ecma-international.org/ecma-402/1.0/ECMA-402.pdf)）。
 
 It provides a special method to compare strings in different languages, following their rules.
-它提供一種特殊方法來比較不同的語言的字串，遵循語言的規則。
+它提供一種特殊方法來比較不同的語言的字串，
+遵循語言的規則。
 
 呼叫 [str.localeCompare(str2)](mdn:js/String/localeCompare) 會根據語言的規則回傳一個整數，該整數能表明 `str` 是小於、相等或大於 `str2`。
 
@@ -551,23 +552,29 @@ It provides a special method to compare strings in different languages, followin
 alert( 'Österreich'.localeCompare('Zealand') ); // -1
 ```
 
-這個方法實際上在 [此文件](mdn:js/String/localeCompare) 指定了兩個額外的參數，它允許指定語言（預設會在環境中獲取語言，字母順序會根據語言不同）並設定額外規則，像是區分大小寫，或是否將 `"a"` 和 `"á"` 視為相同等等。
+這個方法實際上
+在 [此文件](mdn:js/String/localeCompare) 指定了兩個額外的參數，它允許指定語言（預設會在環境中獲取語言，字母順序會根據語言不同）並設定額外規則，像是區分大小寫，或是否將 `"a"` 和 `"á"` 視為相同等等。
 
 ## 內部的, Unicode
 
 ```warn header="進階知識"
-本節將深入字串內部。 如果您打算處理表情符號，稀有的數學或像形文字或其他稀有符號，則此知識對您很有用。
+本節將深入字串內部。 如果您打算處理表情符號，
+稀有的數學或像形文字或其他稀有符號，
+則此知識對您很有用。
 
 如果您不打算為其提供支援，可以跳過本節。
 ```
 
 ### Surrogate pairs 代理對
 
-所有常用字元都有 2 位元代碼。大多數歐洲語言、數字甚至大多象形文字的字母都有一個 2 位元的表現形式。
+所有常用字元都有 2 位元代碼。
+大多數歐洲語言、數字甚至大多象形文字的字母都有一個
+2 位元的表現形式。
 
-但 2 位元組只允許 65536 種組合，對一切可能的符號，這還遠遠不夠。所以稀有符號使用一個成對的，稱作 "代理對（a surrogate pair）" 的 2 位元字元編碼。
+但 2 位元組只允許 65536 種組合，
+對一切可能的符號，這還遠遠不夠。所以稀有符號使用一個成對的，稱作 "代理對（a surrogate pair）" 的 2 位元字元編碼。
 
-這些符號的長度是 `2`：
+這 些符號的長度是 `2`：
 
 ```js run
 alert( '𝒳'.length ); // 2, 大寫數學符號 X
@@ -575,11 +582,13 @@ alert( '😂'.length ); // 2, 笑到流淚的表情
 alert( '𩷶'.length ); // 2, 一個罕見中國象形字
 ```
 
-請注意，JavaScript 創建時，代理對並不存在，因此 JavaScript 無法正確處理！
+請注意，JavaScript 創建時，
+代理對並不存在，因此 JavaScript 無法正確處理！
 
 每個上面的字串，我們實際有的是單獨的符號，但 `length` 長度是 `2`。
 
-`String.fromCodePoint` 和 `str.codePointAt` 都是少數處理代理對的罕見方法。在它們之前，只有  [String.fromCharCode](mdn:js/String/fromCharCode) 和 [str.charCodeAt](mdn:js/String/charCodeAt) 這些方法。這些方法是實際上與 `fromCodePoint/codePointAt` 相同，但不適用於代理對。
+`String.fromCodePoint` 和 `str.codePointAt`
+都是少數處理代理對的罕見方法。在它們之前，只有  [String.fromCharCode](mdn:js/String/fromCharCode) 和 [str.charCodeAt](mdn:js/String/charCodeAt) 這些方法。這些方法是實際上與 `fromCodePoint/codePointAt` 相同，但不適用於代理對。
 
 獲取一個符號可能很棘手，因為代理對被視為兩個字元。
 
@@ -588,32 +597,40 @@ alert( '𝒳'[0] ); // 奇怪的符號...
 alert( '𝒳'[1] ); // ...代理對的片段
 ```
 
-注意，代理對若缺少另外一部分就沒有意義。所以上面範例中的 alert 實際是顯示亂碼。
+注意，代理對若缺少另外一部分就沒有意義。
+所以上面範例中的 alert 實際是顯示亂碼。
 
-技術角度來說，代理對可以用它們的代碼檢測到：如果一個字元代碼在 `0xd800..0xdbff` 之間，那它就是代碼對的第一個部分。下一個字元（第二部分）代碼必須在 `0xdc00..0xdfff` 之間。這些區間是依據標準專門為代理對保留的。
+技術角度來說，代理對可以用它們的代碼檢測到：
+如果一個字元代碼在 `0xd800..0xdbff` 之間，那它就是代碼對的第一個部分。下一個字元（第二部分）代碼必須在 `0xdc00..0xdfff` 之間。這些區間是依據標準專門為代理對保留的。
 
 在上述案例中：
 
 ```js run
-// charCodeAt 不認得代理對（surrogate-pair），因此給出代碼的片段
+// charCodeAt 不認得代理對（surrogate-pair），
+因此給出代碼的片段
 
 alert( '𝒳'.charCodeAt(0).toString(16) ); // d835, 在 0xd800 和 0xdbff 之間
 alert( '𝒳'.charCodeAt(1).toString(16) ); // dcb3, 在 0xdc00 和 0xdfff 之間
 ```
 
-稍後在 <info：iterable> 一章中，您將找到更多處理代理對的方法。 可能也有專門的函式庫，但是沒有什麼足以在這裡建議的。
+稍後在 <info：iterable> 一章中，您將找到更多處理代理對的方法。
+ 可能也有專門的函式庫，但是沒有什麼足以在這裡建議的。
 
 
-### Diacritical marks and normalization 變音標記和標準化
+### Diacritical marks and normalization
+變音標記和標準化
 
 在許多語言中，有些符號是由帶有上標記或下標記的基本字元組成。
 
-例如，字母 `a` 可以是下列的基本字元：`àáâäãåā`。最常見的 "複合" 字元在 UTF-16 表中有自己的代碼。但他們並非全部，因為可能的組合太多。
+例如，字母 `a` 可以是下列的基本字元：`àáâäãåā`。最常見的
+"複合" 字元在 UTF-16 表中有自己的代碼。但他們並非全部，因為可能的組合太多。
 
-為了支援任意組合，UTF-16 允許我們去使用幾個 unicode 字元：基本字元緊跟著一或多個 "裝飾" 它的 "標記" 字元。
+為了支援任意組合，UTF-16 允許我們去使用幾個 unicode 字元：
+基本字元緊跟著一或多個 "裝飾" 它的 "標記" 字元。
 
 For instance, if we have `S` followed by the special "dot above" character (code `\u0307`), it is shown as Ṡ.
-例如，若我們有 `S` 後面跟著特殊 "上標點 (dot above)" 字元（代碼 `\u0307`），顯示為 Ṡ。
+例如，若我們有 `S` 後面跟著特殊
+"上標點 (dot above)" 字元（代碼 `\u0307`），顯示為 Ṡ。
 
 ```js run
 alert( 'S\u0307' ); // Ṡ
@@ -629,7 +646,8 @@ alert( 'S\u0307' ); // Ṡ
 alert( 'S\u0307\u0323' ); // Ṩ
 ```
 
-這提供了極大的靈活性，但還有個有趣的問題：兩個字元在視覺上可能看來相同，但是用不同的 unicode 組合表示。
+這提供了極大的靈活性，但還有個有趣的問題：
+兩個字元在視覺上可能看來相同，但是用不同的 unicode 組合表示。
 
 例如：
 
@@ -642,7 +660,8 @@ alert( `s1: ${s1}, s2: ${s2}` );
 alert( s1 == s2 ); // false 儘管字元看起來是相同的 (?!)
 ```
 
-為了解決這個問題，有一種 "unicode 標準化（unicode normalization）" 演算法，將每個字串轉換為單個 "常規" 格式。
+為了解決這個問題，有一種 "unicode 標準化（unicode normalization）"
+演算法，將每個字串轉換為單個 "常規" 格式。
 
 他透過 [str.normalize()](mdn:js/String/normalize) 實作。
 
@@ -650,7 +669,8 @@ alert( s1 == s2 ); // false 儘管字元看起來是相同的 (?!)
 alert( "S\u0307\u0323".normalize() == "S\u0323\u0307".normalize() ); // true
 ```
 
-我們遇到好玩的現象，`normalize()` 實際將三字元的序列聚集成一個： `\u1e68`（有兩個點的 S）。
+我們遇到好玩的現象，`normalize()` 實際將三字元的序列聚集成一個：
+`\u1e68`（有兩個點的 S）。
 
 ```js run
 alert( "S\u0307\u0323".normalize().length ); // 1
@@ -660,7 +680,9 @@ alert( "S\u0307\u0323".normalize() == "\u1e68" ); // true
 
 事實上，這種例子並非總是像這樣。原因是 `Ṩ` 符號 "足夠常見"，因此 UTF-16 創建者將其包含在主表中並提供代碼。
 
-如果你想了解有關規範化規則和變體的更多信息 -- 它們在 Unicode 標準的附錄中有所描述：[Unicode Normalization Forms](http://www.unicode.org/reports/tr15/)，但對於大多數實際目的來說，本節的信息就足夠了。
+如果你想了解有關規範化規則和變體的更多信息 -- 它們在 Unicode
+標準的附錄中有所描述：[Unicode Normalization Forms](http://www.unicode.org/reports/tr15/)，但對於大多數實際目的來說，
+本節的信息就足夠了。
 
 ## Summary 總結
 
